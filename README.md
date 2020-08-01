@@ -1,0 +1,1 @@
+This is a simple PWA app that helps you track your expenditure.
