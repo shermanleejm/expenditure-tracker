@@ -1,0 +1,32 @@
+[
+  {
+    "date": "19-01-1996",
+    "item": "macbook pro 16",
+    "amount": 4000,
+    "type": "work"
+  },
+  {
+    "date": "20-01-1996",
+    "item": "microsoft surface",
+    "amount": 2000,
+    "type": "work"
+  },
+  {
+    "date": "19-01-1996",
+    "item": "mcdonalds",
+    "amount": 16.7,
+    "type": "food"
+  },
+  {
+    "date": "19-01-1996",
+    "item": "ice cream",
+    "amount": 4.5,
+    "type": "food"
+  },
+  {
+    "date": "19-01-1996",
+    "item": "acai",
+    "amount": 9.5,
+    "type": "food"
+  }
+]
