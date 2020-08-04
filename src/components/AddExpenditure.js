@@ -26,6 +26,7 @@ class CreditDebitRadio extends Component {
     super(props);
     this.state = {
       radioValue: "credit",
+      formSubmitted: false,
     };
   }
 
@@ -75,9 +76,25 @@ export default class AddExpenditure extends Component {
 
     this.state = {
       selectedDate: new Date(),
+      category: null,
+      itemName: null,
+      amount: null,
+      radioValue: "credit",
       expenditureType: ["Leisure", "Salary", "Food"],
       formSubmitted: false,
+      amountIsInt: true,
+      categoryIsFilled: true,
+      itemNameIsFilled: true,
     };
+  }
+
+  isInt(value) {
+    var x;
+    if (isNaN(value)) {
+      return false;
+    }
+    x = parseFloat(value);
+    return (x | 0) === x;
   }
 
   handleDateChange(newDate) {
@@ -93,8 +110,7 @@ export default class AddExpenditure extends Component {
 
   render() {
     if (this.state.formSubmitted) {
-
-    } 
+    }
     return (
       <div style={{ textAlign: "center", padding: "10px" }}>
         <Grid
@@ -120,7 +136,9 @@ export default class AddExpenditure extends Component {
                     clearable
                     placeholder="dd/mm/yyyy"
                     value={this.state.selectedDate}
-                    onChange={(date) => this.handleDateChange(date)}
+                    onChange={(date) => {
+                      this.setState({ selectedDate: date });
+                    }}
                     format="dd-MMM-yyyy"
                     style={{ width: "80%" }}
                   />
@@ -155,14 +173,36 @@ export default class AddExpenditure extends Component {
                       renderInput={(params) => (
                         <TextField
                           {...params}
-                          label="Type of expenditure"
+                          label="Category"
                           variant="outlined"
                         />
                       )}
+                      onChange={(event, value) => {
+                        this.setState({ category: value });
+                      }}
                     />
+                    {!this.state.categoryIsFilled && (
+                      <div style={{ textAlign: "left" }}>
+                        <Typography color="error" variant="caption">
+                          Please choose a category
+                        </Typography>
+                      </div>
+                    )}
                   </Grid>
                   <Grid item>
-                    <TextField variant="outlined" label="Item name" fullWidth />
+                    <TextField
+                      ref="itemName"
+                      variant="outlined"
+                      label="Item name"
+                      fullWidth
+                      onChange={(event) => {
+                        this.setState({ itemName: event.target.value });
+                      }}
+                      error={!this.state.itemNameIsFilled}
+                      helperText={
+                        !this.state.itemNameIsFilled && "Please enter a name"
+                      }
+                    />
                   </Grid>
                   <Grid item>
                     <TextField
@@ -173,10 +213,61 @@ export default class AddExpenditure extends Component {
                           <InputAdornment position="start">$</InputAdornment>
                         ),
                       }}
+                      onChange={(event) => {
+                        let val = event.target.value;
+                        if (this.isInt(val)) {
+                          this.setState({
+                            amount: event.target.value,
+                            amountIsInt: true,
+                          });
+                        } else {
+                          this.setState({
+                            amountIsInt: false,
+                            amount: null,
+                          });
+                          return false;
+                        }
+                      }}
+                      error={!this.state.amountIsInt}
+                      helperText={
+                        !this.state.amountIsInt && "Please enter a number"
+                      }
                     />
                   </Grid>
                   <Grid item>
-                    <CreditDebitRadio />
+                    <FormControl component="fieldset">
+                      <RadioGroup
+                        value={this.state.radioValue}
+                        onChange={(event) =>
+                          this.setState({ radioValue: event.target.value })
+                        }
+                      >
+                        <Grid
+                          container
+                          direction="row"
+                          justify="space-evenly"
+                          alignItems="center"
+                          spacing={3}
+                        >
+                          <Grid item>
+                            <FormControlLabel
+                              value="credit"
+                              control={<Radio color="primary" />}
+                              label="Credit"
+                              labelPlacement="end"
+                            />
+                          </Grid>
+                          <Grid item>
+                            <FormControlLabel
+                              value="debit"
+                              control={<Radio color="primary" />}
+                              label="Debit"
+                              labelPlacement="end"
+                            />
+                          </Grid>
+                        </Grid>
+                      </RadioGroup>
+                    </FormControl>
                   </Grid>
                 </Grid>
               </CardContent>
@@ -191,7 +282,29 @@ export default class AddExpenditure extends Component {
                     : "#ededed",
               }}
             >
-              <Button fullWidth>submit</Button>
+              <Button
+                fullWidth
+                onClick={() => {
+                  if (this.state.category === null) {
+                    this.setState({ categoryIsFilled: false });
+                  }
+
+                  if (this.state.amount === null) {
+                    this.setState({ amountIsInt: false });
+                  }
+
+                  if (this.state.itemName === null) {
+                    this.setState({ itemNameIsFilled: false });
+                  }
+
+                  this.setState({
+                    formSubmitted: true,
+                  });
+                  console.log(this.state);
+                }}
+              >
+                submit
+              </Button>
             </Card>
           </Grid>
         </Grid>

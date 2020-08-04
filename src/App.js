@@ -46,10 +46,6 @@ const styles = {
   selected: {},
 };
 
-async function initDB() {
-  var idb = await openDB("spending", 1);
-}
-
 // async function addToStore(value) {
 
 //   db.put("spending", value)
@@ -64,6 +60,7 @@ async function initDB() {
 class App extends Component {
   constructor(props) {
     super(props);
+    this.initDB();
     this.state = {
       navBarValue: "addExpenditure",
       isDark: (localStorage.getItem("darkMode") == 'true'),
@@ -88,6 +85,10 @@ class App extends Component {
         },
       },
     };
+  }
+
+  async initDB() {
+    var idb = await openDB("main", 1);
   }
 
   setNavBarValue(newValue) {
