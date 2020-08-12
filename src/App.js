@@ -15,12 +15,12 @@ import {
   BottomNavigationAction,
   Button,
 } from "@material-ui/core";
-import { openDB } from "idb";
 import MenuIcon from "@material-ui/icons/Menu";
 import AddIcon from "@material-ui/icons/Add";
 import TrendingUpIcon from "@material-ui/icons/TrendingUp";
 import PersonIcon from "@material-ui/icons/Person";
 
+import { initDB, insert } from "./components/ConnectionManager";
 import Overview from "./components/Overview";
 import AddExpenditure from "./components/AddExpenditure";
 import Profile from "./components/Profile";
@@ -60,10 +60,10 @@ const styles = {
 class App extends Component {
   constructor(props) {
     super(props);
-    this.initDB();
     this.state = {
       navBarValue: "addExpenditure",
       isDark: (localStorage.getItem("darkMode") == 'true'),
+      idb: initDB(),
       navBarItems: {
         overview: {
           icon: <TrendingUpIcon fontSize="Large" />,
@@ -87,9 +87,7 @@ class App extends Component {
     };
   }
 
-  async initDB() {
-    var idb = await openDB("main", 1);
-  }
+
 
   setNavBarValue(newValue) {
     this.setState({

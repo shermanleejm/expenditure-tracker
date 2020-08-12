@@ -11,7 +11,7 @@ class Profile extends Component {
 
   render() {
     return (
-      <div style={{ height: "100%", padding: "20px" }}>
+      <div style={{ padding: "20px" }}>
         <Grid
           container
           direction="row"

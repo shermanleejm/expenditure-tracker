@@ -21,6 +21,8 @@ import DateFnsUtils from "@date-io/date-fns";
 import testData from "../test/sample_data.json";
 // import MomentUtils from "@date-io/moment";
 
+import { initDB, insert } from "./ConnectionManager";
+
 class CreditDebitRadio extends Component {
   constructor(props) {
     super(props);
@@ -110,205 +112,232 @@ export default class AddExpenditure extends Component {
 
   render() {
     if (this.state.formSubmitted) {
-    }
-    return (
-      <div style={{ textAlign: "center", padding: "10px" }}>
-        <Grid
-          container
-          direction="column"
-          justify="center"
-          alignItems="center"
-          spacing={2}
-        >
-          <Grid item style={{ width: "90vw" }}>
-            <Card
-              style={{
-                backgroundColor:
-                  localStorage.getItem("darkMode") == "true"
-                    ? "#696969"
-                    : "#ededed",
-              }}
-            >
-              <CardContent>
-                <Typography variant="h6">Enter the date of purchase</Typography>
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                  <KeyboardDatePicker
-                    clearable
-                    placeholder="dd/mm/yyyy"
-                    value={this.state.selectedDate}
-                    onChange={(date) => {
-                      this.setState({ selectedDate: date });
-                    }}
-                    format="dd-MMM-yyyy"
-                    style={{ width: "80%" }}
-                  />
-                </MuiPickersUtilsProvider>
-              </CardContent>
-            </Card>
-          </Grid>
-          {/* {this.state.dailyEntries.map((option) => {
-            return option;
-          })} */}
-          <Grid item style={{ width: "90vw" }}>
-            <Card
-              style={{
-                backgroundColor:
-                  localStorage.getItem("darkMode") == "true"
-                    ? "#696969"
-                    : "#ededed",
-              }}
-            >
-              <CardContent>
-                <Grid
-                  container
-                  direction="column"
-                  justify="center"
-                  alignItems="stretch"
-                  spacing={2}
-                >
-                  <Grid item>
-                    <Autocomplete
-                      options={this.state.expenditureType}
-                      // getOptionLabel={(option) => option.type}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="Category"
-                          variant="outlined"
-                        />
-                      )}
-                      onChange={(event, value) => {
-                        this.setState({ category: value });
-                      }}
-                    />
-                    {!this.state.categoryIsFilled && (
-                      <div style={{ textAlign: "left" }}>
-                        <Typography color="error" variant="caption">
-                          Please choose a category
-                        </Typography>
-                      </div>
-                    )}
-                  </Grid>
-                  <Grid item>
-                    <TextField
-                      ref="itemName"
-                      variant="outlined"
-                      label="Item name"
-                      fullWidth
-                      onChange={(event) => {
-                        this.setState({ itemName: event.target.value });
-                      }}
-                      error={!this.state.itemNameIsFilled}
-                      helperText={
-                        !this.state.itemNameIsFilled && "Please enter a name"
-                      }
-                    />
-                  </Grid>
-                  <Grid item>
-                    <TextField
-                      label="Amount"
-                      fullWidth
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">$</InputAdornment>
-                        ),
-                      }}
-                      onChange={(event) => {
-                        let val = event.target.value;
-                        if (this.isInt(val)) {
-                          this.setState({
-                            amount: event.target.value,
-                            amountIsInt: true,
-                          });
-                        } else {
-                          this.setState({
-                            amountIsInt: false,
-                            amount: null,
-                          });
-                          return false;
-                        }
-                      }}
-                      error={!this.state.amountIsInt}
-                      helperText={
-                        !this.state.amountIsInt && "Please enter a number"
-                      }
-                    />
-                  </Grid>
-                  <Grid item>
-                    <FormControl component="fieldset">
-                      <RadioGroup
-                        value={this.state.radioValue}
-                        onChange={(event) =>
-                          this.setState({ radioValue: event.target.value })
-                        }
-                      >
-                        <Grid
-                          container
-                          direction="row"
-                          justify="space-evenly"
-                          alignItems="center"
-                          spacing={3}
-                        >
-                          <Grid item>
-                            <FormControlLabel
-                              value="credit"
-                              control={<Radio color="primary" />}
-                              label="Credit"
-                              labelPlacement="end"
-                            />
-                          </Grid>
-                          <Grid item>
-                            <FormControlLabel
-                              value="debit"
-                              control={<Radio color="primary" />}
-                              label="Debit"
-                              labelPlacement="end"
-                            />
-                          </Grid>
-                        </Grid>
-                      </RadioGroup>
-                    </FormControl>
-                  </Grid>
-                </Grid>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item style={{ width: "90vw" }}>
-            <Card
-              style={{
-                backgroundColor:
-                  localStorage.getItem("darkMode") == "true"
-                    ? "#696969"
-                    : "#ededed",
-              }}
-            >
-              <Button
-                fullWidth
-                onClick={() => {
-                  if (this.state.category === null) {
-                    this.setState({ categoryIsFilled: false });
-                  }
-
-                  if (this.state.amount === null) {
-                    this.setState({ amountIsInt: false });
-                  }
-
-                  if (this.state.itemName === null) {
-                    this.setState({ itemNameIsFilled: false });
-                  }
-
-                  this.setState({
-                    formSubmitted: true,
-                  });
-                  console.log(this.state);
+      return (
+        <div style={{ padding: "20px", margin: "auto", textAlign: "center" }}>
+          Your expenditure has been added.
+          <br />
+          <Button
+            onClick={() => {
+              this.setState({ formSubmitted: false });
+            }}
+          >
+            ADD MORE
+          </Button>
+        </div>
+      );
+    } else {
+      return (
+        <div style={{ textAlign: "center", padding: "10px" }}>
+          <Grid
+            container
+            direction="column"
+            justify="center"
+            alignItems="center"
+            spacing={2}
+          >
+            <Grid item style={{ width: "90vw" }}>
+              <Card
+                style={{
+                  backgroundColor:
+                    localStorage.getItem("darkMode") == "true"
+                      ? "#696969"
+                      : "#ededed",
                 }}
               >
-                submit
-              </Button>
-            </Card>
+                <CardContent>
+                  <Typography variant="h6">
+                    Enter the date of purchase
+                  </Typography>
+                  <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <KeyboardDatePicker
+                      clearable
+                      placeholder="dd/mm/yyyy"
+                      value={this.state.selectedDate}
+                      onChange={(date) => {
+                        this.setState({ selectedDate: date });
+                      }}
+                      format="dd-MMM-yyyy"
+                      style={{ width: "80%" }}
+                    />
+                  </MuiPickersUtilsProvider>
+                </CardContent>
+              </Card>
+            </Grid>
+            {/* {this.state.dailyEntries.map((option) => {
+            return option;
+          })} */}
+            <Grid item style={{ width: "90vw" }}>
+              <Card
+                style={{
+                  backgroundColor:
+                    localStorage.getItem("darkMode") == "true"
+                      ? "#696969"
+                      : "#ededed",
+                }}
+              >
+                <CardContent>
+                  <Grid
+                    container
+                    direction="column"
+                    justify="center"
+                    alignItems="stretch"
+                    spacing={2}
+                  >
+                    <Grid item>
+                      <Autocomplete
+                        options={this.state.expenditureType}
+                        // getOptionLabel={(option) => option.type}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label="Category"
+                            variant="outlined"
+                          />
+                        )}
+                        onChange={(event, value) => {
+                          this.setState({
+                            category: value,
+                            categoryIsFilled: true,
+                          });
+                        }}
+                      />
+                      {!this.state.categoryIsFilled && (
+                        <div style={{ textAlign: "left" }}>
+                          <Typography color="error" variant="caption">
+                            Please choose a category
+                          </Typography>
+                        </div>
+                      )}
+                    </Grid>
+                    <Grid item>
+                      <TextField
+                        ref="itemName"
+                        variant="outlined"
+                        label="Item name"
+                        fullWidth
+                        onChange={(event) => {
+                          this.setState({
+                            itemName: event.target.value,
+                            itemNameIsFilled: true,
+                          });
+                        }}
+                        error={!this.state.itemNameIsFilled}
+                        helperText={
+                          !this.state.itemNameIsFilled && "Please enter a name"
+                        }
+                      />
+                    </Grid>
+                    <Grid item>
+                      <TextField
+                        label="Amount"
+                        fullWidth
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">$</InputAdornment>
+                          ),
+                        }}
+                        onChange={(event) => {
+                          let val = event.target.value;
+                          if (this.isInt(val)) {
+                            this.setState({
+                              amount: event.target.value,
+                              amountIsInt: true,
+                            });
+                          } else {
+                            this.setState({
+                              amountIsInt: false,
+                              amount: null,
+                            });
+                            return false;
+                          }
+                        }}
+                        error={!this.state.amountIsInt}
+                        helperText={
+                          !this.state.amountIsInt && "Please enter a number"
+                        }
+                      />
+                    </Grid>
+                    <Grid item>
+                      <FormControl component="fieldset">
+                        <RadioGroup
+                          value={this.state.radioValue}
+                          onChange={(event) =>
+                            this.setState({ radioValue: event.target.value })
+                          }
+                        >
+                          <Grid
+                            container
+                            direction="row"
+                            justify="space-between"
+                            alignItems="center"
+                          >
+                            <Grid item md={2}>
+                              <FormControlLabel
+                                value="credit"
+                                control={<Radio color="primary" />}
+                                label="Credit"
+                                labelPlacement="end"
+                              />
+                            </Grid>
+                            <Grid item md={2}>
+                              <FormControlLabel
+                                value="debit"
+                                control={<Radio color="primary" />}
+                                label="Debit"
+                                labelPlacement="end"
+                              />
+                            </Grid>
+                          </Grid>
+                        </RadioGroup>
+                      </FormControl>
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item style={{ width: "90vw" }}>
+              <Card
+                style={{
+                  backgroundColor:
+                    localStorage.getItem("darkMode") == "true"
+                      ? "#696969"
+                      : "#ededed",
+                }}
+              >
+                <Button
+                  fullWidth
+                  onClick={() => {
+                    if (this.state.category === null) {
+                      this.setState({ categoryIsFilled: false });
+                    }
+
+                    if (this.state.amount === null) {
+                      this.setState({ amountIsInt: false });
+                    }
+
+                    if (this.state.itemName === null) {
+                      this.setState({ itemNameIsFilled: false });
+                    }
+
+                    if (
+                      this.state.category !== null &&
+                      this.state.amount !== null &&
+                      this.state.itemName !== null
+                    ) {
+                      this.setState({
+                        formSubmitted: true,
+                      });
+                      console.log(this.state);
+                    }
+                  }}
+                >
+                  submit
+                </Button>
+              </Card>
+            </Grid>
           </Grid>
-        </Grid>
-      </div>
-    );
+        </div>
+      );
+    }
   }
 }
