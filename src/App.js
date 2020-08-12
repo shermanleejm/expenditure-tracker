@@ -15,7 +15,6 @@ import {
   BottomNavigationAction,
   Button,
 } from "@material-ui/core";
-import { openDB } from "idb";
 import MenuIcon from "@material-ui/icons/Menu";
 import AddIcon from "@material-ui/icons/Add";
 import TrendingUpIcon from "@material-ui/icons/TrendingUp";
@@ -46,10 +45,6 @@ const styles = {
   selected: {},
 };
 
-async function initDB() {
-  var idb = await openDB("spending", 1);
-}
-
 // async function addToStore(value) {
 
 //   db.put("spending", value)
@@ -67,6 +62,7 @@ class App extends Component {
     this.state = {
       navBarValue: "addExpenditure",
       isDark: (localStorage.getItem("darkMode") == 'true'),
+      idb: indexedDB.open("main", 1),
       navBarItems: {
         overview: {
           icon: <TrendingUpIcon fontSize="Large" />,
