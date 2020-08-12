@@ -20,6 +20,7 @@ import AddIcon from "@material-ui/icons/Add";
 import TrendingUpIcon from "@material-ui/icons/TrendingUp";
 import PersonIcon from "@material-ui/icons/Person";
 
+import { initDB, insert } from "./components/ConnectionManager";
 import Overview from "./components/Overview";
 import AddExpenditure from "./components/AddExpenditure";
 import Profile from "./components/Profile";
@@ -85,6 +86,8 @@ class App extends Component {
       },
     };
   }
+
+
 
   setNavBarValue(newValue) {
     this.setState({
