@@ -20,7 +20,7 @@ import AddIcon from "@material-ui/icons/Add";
 import TrendingUpIcon from "@material-ui/icons/TrendingUp";
 import PersonIcon from "@material-ui/icons/Person";
 
-import { initDB, insert } from "./components/ConnectionManager";
+import { initDB, addSpending } from "./components/ConnectionManager";
 import Overview from "./components/Overview";
 import AddExpenditure from "./components/AddExpenditure";
 import Profile from "./components/Profile";
@@ -46,24 +46,14 @@ const styles = {
   selected: {},
 };
 
-// async function addToStore(value) {
-
-//   db.put("spending", value)
-//     .then((result) => {
-//       console.log("success", result);
-//     })
-//     .catch((err) => console.log("error: ", err));
-
-//   db.close();
-// }
-
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       navBarValue: "addExpenditure",
-      isDark: (localStorage.getItem("darkMode") == 'true'),
-      idb: indexedDB.open("main", 1),
+      isDark: localStorage.getItem("darkMode") == "true",
+      useTestData: localStorage.getItem("useTestData") == "true",
+      db: this.initDB(),
       navBarItems: {
         overview: {
           icon: <TrendingUpIcon fontSize="Large" />,
@@ -75,19 +65,45 @@ class App extends Component {
           icon: <AddIcon fontSize="Large" />,
           label: "Add",
           value: "addExpenditure",
-          component: <AddExpenditure />,
+          component: <AddExpenditure db={this.initDB()} />,
         },
         profile: {
           icon: <PersonIcon fontSize="Large" />,
           label: "Profile",
           value: "profile",
-          component: <Profile toggleDM={this.toggleDarkMode} />,
+          component: (
+            <Profile
+              toggleDM={this.toggleDarkMode}
+              toggleTD={this.toggleTestData}
+            />
+          ),
         },
       },
     };
   }
 
+  initDB() {
+    let db;
+    let dbReq = indexedDB.open("main", 1);
 
+    dbReq.onupgradeneeded = function (event) {
+      db = event.target.result;
+      let spending = db.createObjectStore("spending", { autoIncrement: true });
+    };
+
+    dbReq.onsuccess = function (event) {
+      db = event.target.result;
+    };
+
+    dbReq.onerror = function (event) {
+      console.log("error opening database " + event.target.errorCode);
+      alert(
+        "Sorry, this application requires some functionalities that are not supported by your browser. Please use a newer browser, thank you! "
+      );
+    };
+
+    return db;
+  }
 
   setNavBarValue(newValue) {
     this.setState({
@@ -96,11 +112,19 @@ class App extends Component {
   }
 
   toggleDarkMode = () => {
-    var oldState = this.state
+    var oldState = this.state;
     this.setState({
       isDark: !oldState.isDark,
     });
     localStorage.setItem("darkMode", JSON.stringify(!oldState.isDark));
+  };
+
+  toggleTestData = () => {
+    var oldState = this.state;
+    this.setState({
+      useTestData: !oldState.useTestData,
+    });
+    localStorage.setItem("useTestData", JSON.stringify(!oldState.useTestData));
   };
 
   render() {

@@ -22,7 +22,7 @@ import DateFnsUtils from "@date-io/date-fns";
 import testData from "../test/sample_data.json";
 // import MomentUtils from "@date-io/moment";
 
-import { initDB, insert } from "./ConnectionManager";
+import { initDB, addSpending } from "./ConnectionManager";
 
 class CreditDebitRadio extends Component {
   constructor(props) {
@@ -78,6 +78,7 @@ export default class AddExpenditure extends Component {
     super(props);
 
     this.state = {
+      db: initDB(),
       selectedDate: new Date(),
       category: null,
       itemName: null,
@@ -106,6 +107,9 @@ export default class AddExpenditure extends Component {
   }
 
   render() {
+    // let testDate = new Date(Date.parse("1996-01-19"));
+    // console.log(testDate.toISOString().slice(0, 10));
+    // console.log(this.state.selectedDate.toLocaleDateString());
     if (this.state.formSubmitted === true) {
       return (
         <div style={{ padding: "20px" }}>
@@ -346,7 +350,15 @@ export default class AddExpenditure extends Component {
                       this.setState({
                         formSubmitted: true,
                       });
-                      console.log(this.state);
+                      let value = {
+                        category: this.state.category,
+                        itemName: this.state.itemName,
+                        amount: this.state.amount,
+                        transactionType: this.state.radioValue,
+                        date: this.state.selectedDate.toISOString().slice(0, 10),
+                      };
+                      console.log(value);
+                      addSpending(value);
                     }
                   }}
                 >
