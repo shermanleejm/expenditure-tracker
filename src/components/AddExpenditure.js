@@ -19,10 +19,10 @@ import {
   MuiPickersUtilsProvider,
 } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
-import testData from "../test/sample_data.json";
 // import MomentUtils from "@date-io/moment";
 
 import { initDB, addSpending } from "./ConnectionManager";
+import testData from "./sample_data";
 
 class CreditDebitRadio extends Component {
   constructor(props) {
@@ -77,6 +77,15 @@ export default class AddExpenditure extends Component {
   constructor(props) {
     super(props);
 
+    var expenditureTypes = [];
+    var sample = testData.testData;
+    sample.map((item) => {
+      if (!expenditureTypes.includes(item.category)) {
+        expenditureTypes.push(item.category);
+        expenditureTypes.sort(this.compare);
+      }
+    });
+
     this.state = {
       db: initDB(),
       selectedDate: new Date(),
@@ -84,12 +93,19 @@ export default class AddExpenditure extends Component {
       itemName: null,
       amount: null,
       radioValue: "credit",
-      expenditureType: ["Leisure", "Salary", "Food"],
+      expenditureType: expenditureTypes,
       formSubmitted: false,
       amountIsInt: true,
       categoryIsFilled: true,
       itemNameIsFilled: true,
     };
+  }
+
+  compare(a, b) {
+    if (a < b) {
+      return -1;
+    }
+    return 1;
   }
 
   isInt(value) {
@@ -110,6 +126,7 @@ export default class AddExpenditure extends Component {
     // let testDate = new Date(Date.parse("1996-01-19"));
     // console.log(testDate.toISOString().slice(0, 10));
     // console.log(this.state.selectedDate.toLocaleDateString());
+    console.log(this.state.expenditureType);
     if (this.state.formSubmitted === true) {
       return (
         <div style={{ padding: "20px" }}>
@@ -351,11 +368,13 @@ export default class AddExpenditure extends Component {
                         formSubmitted: true,
                       });
                       let value = {
-                        category: this.state.category,
+                        category: this.state.category.toString().toLowerCase(),
                         itemName: this.state.itemName,
-                        amount: this.state.amount,
+                        amount: parseInt(this.state.amount),
                         transactionType: this.state.radioValue,
-                        date: this.state.selectedDate.toISOString().slice(0, 10),
+                        date: this.state.selectedDate
+                          .toISOString()
+                          .slice(0, 10),
                       };
                       console.log(value);
                       addSpending(value);
